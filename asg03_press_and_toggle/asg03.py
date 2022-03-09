@@ -20,8 +20,8 @@ class Main:
 
     def sw_handle(self,e):
         self.count+=1
-        print(self.count%4)
-        toggle.toggle(PIN_O,condition = self.count%4==0)
+        print(self.count%2)
+        toggle.toggle(PIN_O,condition = self.count%2==1)
 def main():
     Main()
     
