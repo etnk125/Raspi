@@ -1,6 +1,6 @@
 
 import RPi.GPIO as GPIO
-from .module import pi, toggle
+from module import pi, toggle
 
 PIN_I = 3
 PIN_O = 5

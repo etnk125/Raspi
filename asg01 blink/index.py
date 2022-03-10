@@ -1,4 +1,4 @@
-from .module import pi, blink
+from module import pi, blink
 
 import RPi.GPIO as GPIO
 import time
