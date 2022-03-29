@@ -1,3 +1,34 @@
+
+# URL 
+[google sheet url](https://docs.google.com/spreadsheets/d/1-Hp5QSB9J4o3Ljcb1Mn9XatZvVPePCXGoufBd5jaR5k/edit?usp=sharing)
+
+# update timestamp and led status every 2 sec -> press to toggle led
+
+using
+
+- set switch as **PULL_UP**
+- set led as **active high**
+```py
+  # led 
+  PIN_O = 3
+  def inp(pin:int):
+    GPIO.setup(pin,GPIO.IN)
+    
+  # switch
+  PIN_I = 7
+  def init():
+    GPIO.setwarnings(False)
+    GPIO.setmode(GPIO.BOARD)
+
+  def outp(pin:int):
+    GPIO.setup(pin,GPIO.OUT)
+
+  def use_switch(pin,handle = None ):
+    GPIO.setup(pin,GPIO.IN,pull_up_down = GPIO.PUD_UP)
+    GPIO.add_event_detect(pin,GPIO.FALLING,callback = handle,bouncetime=200)
+```
+
+
 # getting start
 1. create gg cloud platform instance
 2. apply api
@@ -55,17 +86,7 @@ sudo pip3 install --upgrade oauth2client
   ```
   worksheet.delete_row(row)
   ```
-
-  1.specify index as a integer indicating the position of the sheet to open starting from 0:
-
-wks = gc.open("doc_name").get_worksheet(index)
-
-or
-
-2.specify title of the sheet to open as a string:
-
-wks = gc.open("doc_name").worksheet(title)
-
-That is to say, in you case, to get sheet2 you can probably use
-
-wks = gc.open("doc_name").get_worksheet(1)
+Author
+  ```
+  Natthawee Koengfak 6213125
+  ```

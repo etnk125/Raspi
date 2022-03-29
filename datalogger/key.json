@@ -1,21 +1,3 @@
-# getting start
-1. create gg cloud platform instance
-2. apply api
-   - gg sheet
-   - gg drive
-3. create credential as json
-4. create gg sheet and add editor mail from credential file
-   
-## install 
-
-```cmd
-sudo pip3 install gspread
-sudo pip3 install --upgrade oauth2client
-```
-
-## credential example:
-
-```json
 {
   "type": "service_account",
   "project_id": "triple-carrier-345610",
@@ -28,44 +10,3 @@ sudo pip3 install --upgrade oauth2client
   "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
   "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/sheet-331%40triple-carrier-345610.iam.gserviceaccount.com"
 }
-
-```
-## command
-1. Insert in specific line
-  ```
-  worksheet.insert_row(data,row)
-  ```
-2. Append data to the next row
-  ```
-  worksheet.append_row(data1,data2,…,dataN)
-  ```
-3. Update data
-  ```
-  worksheet.update_cell(row,col,data)
-  ```
-4. Read data
-  ```
-  x = worksheet.get_all_records()
-  ```
-5. Read data from cell
-  ```
-  x = worksheet.cell(row,col)
-  ```
-6. Delete data
-  ```
-  worksheet.delete_row(row)
-  ```
-
-  1.specify index as a integer indicating the position of the sheet to open starting from 0:
-
-wks = gc.open("doc_name").get_worksheet(index)
-
-or
-
-2.specify title of the sheet to open as a string:
-
-wks = gc.open("doc_name").worksheet(title)
-
-That is to say, in you case, to get sheet2 you can probably use
-
-wks = gc.open("doc_name").get_worksheet(1)
