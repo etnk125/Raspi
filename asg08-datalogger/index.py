@@ -1,4 +1,5 @@
 # Natthawee Koengfak 6213125
+# https://docs.google.com/spreadsheets/d/1-Hp5QSB9J4o3Ljcb1Mn9XatZvVPePCXGoufBd5jaR5k/edit?usp=sharing
 import time
 from datetime import datetime
 import gspread
@@ -91,11 +92,11 @@ class Main:
         gpio_init()
 
         # using led
-        inp(self.PIN_O)
-        toggle(self.status)
+        outp(self.PIN_O)
+        toggle(self.PIN_O,self.status)
 
         # using switch
-        outp(self.PIN_SW)
+        # inp(self.PIN_SW)
         use_switch(self.PIN_SW, self.sw_handle)
 
     def sw_handle(self, e):
@@ -109,11 +110,16 @@ class Main:
             now = datetime.now()
             timestamp = now.strftime("%H:%M:%S")
 
+            cells = self.worksheet.range('A2:B2')
+            cells[0].value = timestamp
+            cells[1].value = self.status
+
+
             try:
-                self.worksheet.append_row([timestamp, self.status])
+                self.worksheet.update_cells(cells)
                 print(timestamp, self.status)
-            except:
-                print("Google sheet login failed with error:", Exception)
+            except Exception as ex:
+                print("Google sheet login failed with error:",ex)
             time.sleep(2)
 
 
