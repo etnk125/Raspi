@@ -87,3 +87,7 @@ sudo pip3 install --upgrade oauth2client
   ```
   worksheet.delete_row(row)
   ```
+Author
+  ```
+  Natthawee Koengfak 6213125
+  ```
