@@ -5,15 +5,15 @@ from datetime import datetime
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 
-SheetName = "Data Logger Online"
-GSheet_OAUTH_JSON = "triple-carrier-345610-508336cf27b1.json"
+SheetName = "data logger online"
+GSheet_OAUTH_JSON = "key.json"
 scope = ["https://spreadsheets.google.com/feeds",
          "https://www.googleapis.com/auth/drive"]
 
 credentials = ServiceAccountCredentials.from_json_keyfile_name(
     GSheet_OAUTH_JSON, scope)
 client = gspread.authorize(credentials)
-worksheet = client.open(SheetName).sheet1
+worksheet = client.open(SheetName).get_worksheet(0)
 
 # clear worksheet
 worksheet.clear()
