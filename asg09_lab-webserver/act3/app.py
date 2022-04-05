@@ -20,7 +20,8 @@ def updateTime():
     now = datetime.datetime.now()
     timeString = "TIME: " + now.strftime("%H:%M:%S")
     global adc
-    OutputType = State.state()
+    global state
+    OutputType = state
     OutputValue = 100 if OutputType else adc.read_adc(0)
     UpdateTimeOnweb = {
         'type': OutputType,
@@ -32,25 +33,21 @@ def updateTime():
 
 @app.route('/changeState')
 def changeState():
-    State.toggle()
-    return jsonify(state=State.state)
+    global state
+    state = not state
+    return jsonify(state=state)
 
 
 def GPIO_init(GPIO):
-
+    global adc
+    global state
+    adc = Adafruit_ADS1x15.ADS1115()
+    state = True
     GPIO.setmode(GPIO.BOARD)
     GPIO.setwarnings(False)
     GPIO.setup(P_OUT, GPIO.OUT)
 
 
-class State:
-    state = True
-
-    def toggle(self):
-        self.state = not self.state
-
-
 if __name__ == '__main__':
-
     GPIO_init(GPIO)
     app.run(debug=True, host='0.0.0.0', port=80)
