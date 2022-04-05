@@ -3,7 +3,7 @@ import datetime
 import RPi.GPIO as GPIO
 import Adafruit_ADS1x15
 
-state=True
+state = True
 
 adc = Adafruit_ADS1x15.ADS1115()
 app = Flask(__name__)
@@ -41,8 +41,8 @@ def changeState():
     return jsonify(state=state)
 
 
-def GPIO_init(GPIO,adc):
-    # global adc
+def GPIO_init(GPIO):
+    global adc
     global state
     adc = Adafruit_ADS1x15.ADS1115()
     state = True
@@ -51,9 +51,7 @@ def GPIO_init(GPIO,adc):
     # GPIO.setup(P_OUT, GPIO.OUT)
 
 
-
-
 if __name__ == '__main__':
-    
-    GPIO_init(GPIO,adc)
+
+    GPIO_init(GPIO)
     app.run(debug=True, host='0.0.0.0', port=80)
