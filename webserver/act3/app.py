@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, Markup, jsonify
-from datetime import datetime
-import PRi.GPIO as GPIO
+import datetime
+import RPi.GPIO as GPIO
 
 
 app = Flask(__name__)
