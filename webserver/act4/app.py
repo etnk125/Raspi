@@ -18,6 +18,7 @@ def updateTime():
     P_IN = 5
     state = GPIO.input(P_IN)
     Button_Status = "ON" if state else "OFF"
+    print(state,Button_Status)
     now = datetime.datetime.now()
     timeString = "TIME: " + now.strftime("%H:%M:%S")
     UpdateTimeOnweb = {
