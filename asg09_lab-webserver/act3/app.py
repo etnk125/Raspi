@@ -21,14 +21,13 @@ def updateTime():
 
     now = datetime.datetime.now()
     timeString = "TIME: " + now.strftime("%H:%M:%S")
-    global adc
     global state
-    OutputType = state
-    OutputValue = 100 if OutputType else adc.read_adc(0)
+    OutputType = "value" if state else "percent"
+    OutputValue = adc_val(state)
     UpdateTimeOnweb = {
         'type': OutputType,
         'value': OutputValue,
-        'Time': timeString
+        'timeupdate': timeString
     }
     return jsonify(**UpdateTimeOnweb)
 
@@ -42,14 +41,21 @@ def changeState():
 
 
 def GPIO_init(GPIO):
-    global adc
     global state
-    adc = Adafruit_ADS1x15.ADS1115()
+    global max_val
+    max_val = 1
     state = True
     GPIO.setmode(GPIO.BOARD)
     GPIO.setwarnings(False)
     # GPIO.setup(P_OUT, GPIO.OUT)
-
+def adc_val(state):
+    val = max(adc.read_adc(0),0)
+    global max_val 
+    max_val = max(val,max_val )
+    if(state):
+        return val
+    return int(val/max_val*100)
+    
 
 if __name__ == '__main__':
 
