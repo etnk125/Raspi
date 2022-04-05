@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash, Mar
 import datetime
 import RPi.GPIO as GPIO
 
+state=True
 
 app = Flask(__name__)
 
@@ -18,8 +19,9 @@ def updateTime():
 
     now = datetime.datetime.now()
     timeString = "TIME: " + now.strftime("%H:%M:%S")
+    global state
 
-    OutputType = State.state()
+    OutputType = state
     OutputValue = 100 if OutputType else 40000
     UpdateTimeOnweb = {
         'type': OutputType,
@@ -31,8 +33,10 @@ def updateTime():
 
 @app.route('/changeState')
 def changeState():
-    State.toggle()
-    return jsonify(state=State.state)
+    global state
+    state = not state
+    print(state)
+    return jsonify(state=state)
 
 
 def GPIO_init(GPIO):
@@ -42,14 +46,9 @@ def GPIO_init(GPIO):
     GPIO.setup(P_OUT, GPIO.OUT)
 
 
-class State:
-    state = True
-
-    def toggle(self):
-        self.state = not self.state
 
 
 if __name__ == '__main__':
-
+    
     GPIO_init(GPIO)
     app.run(debug=True, host='0.0.0.0', port=80)
