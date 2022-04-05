@@ -1,9 +1,11 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, Markup, jsonify
 import datetime
 import RPi.GPIO as GPIO
+import Adafruit_ADS1x15
 
 state=True
 
+adc = Adafruit_ADS1x15.ADS1115()
 app = Flask(__name__)
 
 
@@ -19,10 +21,10 @@ def updateTime():
 
     now = datetime.datetime.now()
     timeString = "TIME: " + now.strftime("%H:%M:%S")
+    global adc
     global state
-
     OutputType = state
-    OutputValue = 100 if OutputType else 40000
+    OutputValue = 100 if OutputType else adc.read_adc(0)
     UpdateTimeOnweb = {
         'type': OutputType,
         'value': OutputValue,
@@ -39,16 +41,19 @@ def changeState():
     return jsonify(state=state)
 
 
-def GPIO_init(GPIO):
-    P_OUT = 3
+def GPIO_init(GPIO,adc):
+    # global adc
+    global state
+    adc = Adafruit_ADS1x15.ADS1115()
+    state = True
     GPIO.setmode(GPIO.BOARD)
     GPIO.setwarnings(False)
-    GPIO.setup(P_OUT, GPIO.OUT)
+    # GPIO.setup(P_OUT, GPIO.OUT)
 
 
 
 
 if __name__ == '__main__':
     
-    GPIO_init(GPIO)
+    GPIO_init(GPIO,adc)
     app.run(debug=True, host='0.0.0.0', port=80)
