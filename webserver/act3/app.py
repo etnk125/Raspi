@@ -23,7 +23,10 @@ def updateTime():
 @app.route('/<pin>/<action>')
 def LEDControl(pin, action):
     print('Control LED')
-    GPIO.output(int(pin), GPIO.HIGH if action is "ON" else GPIO.LOW)
+    print(pin,action)
+    print(type(pin),type(action))
+    GPIO.output(int(pin), GPIO.HIGH if action == "ON" else GPIO.LOW)
+    return jsonify(status=action)
 
 
 def GPIO_init(GPIO):
