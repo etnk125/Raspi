@@ -27,25 +27,13 @@ def on_message(client, userdata, msg):
     print(str(msg.payload))
     data = str(msg.payload).split(",")
     print(data)
-    data_split = data[1].split("{")[1].split(":")
-    data_split2 = data[2].split(":")
-    print(data_split)
-    print(data_split2)
-    key = data_split[0].split('"')[1]
-    key2 = data_split2[0].split('"')[1]
-    print(key)
-    value = data_split[1].split('}')[0]
-    value2 = data_split2[1].split('}')[0]
-    print(value)
-    print(value2)
-    if value[0] == '"':
-        value = value.split('"')[1]
-    myData[key] = value
-    print(key, value)
-    print(key2, value2)
+    for e in data:
+        current = e.split(': ')
+        if current[0].replace('"', "") == 'led':
+            print(e)
 
 
-# Connecting to NETPIE
+            # Connecting to NETPIE
 client = mqtt.Client(protocol=mqtt.MQTTv311,
                      client_id=CLIENT_ID, clean_session=True)
 client.username_pw_set(DEVICE_TOKEN)
