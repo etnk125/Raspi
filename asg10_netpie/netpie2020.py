@@ -4,6 +4,9 @@ import paho.mqtt.client as mqtt  # pip3 install paho-mqtt
 import json
 import random
 
+import Adafruit_ADS1x15
+adc = Adafruit_ADS1x15.ADS1115()
+
 myData = {"ID": 123, "value": 0}
 
 # Initialize Netpie information
@@ -22,16 +25,23 @@ def on_connect(client, userdata, flags, rc):
 def on_subscribe(client, userdata, mid, granted_qos):
     print("Subscribe successful")
 
+def gpio_init():
+    GPIO.setmode(GPIO.BOARD)
+    GPIO.setwarnings(False)
+    GPIO.setup(7, GPIO.OUT)
+
+def adc_val():
+    return max(adc.read_adc(0),0)
 
 def on_message(client, userdata, msg):
-    print(str(msg.payload))
-    data = str(msg.payload).split(",")
-    print(data)
-    for e in data:
-        current = e.split(': ')
-        if current[0].replace('"', "") == 'led':
-            print(e)
-
+    load = json.loads(msg.payload)
+    print(load['data'])
+    if load['data'].get('led') is not None:
+        print(load['data']['led'])
+        if load['data']['led']=="ON":
+            GPIO.output(7, GPIO.HIGH)
+        if load['data']['led']=="OFF":
+            GPIO.output(7, GPIO.LOW)
 
             # Connecting to NETPIE
 client = mqtt.Client(protocol=mqtt.MQTTv311,
@@ -41,17 +51,17 @@ client.on_connect = on_connect
 client.on_message = on_message
 client.connect(NETPIE_HOST, 1883)
 client.loop_start()
-
+gpio_init()
 value = 0
 try:
     while True:
 
-        myData['value'] = random.randint(0, 1000)
+        myData['value'] = adc_val()
         myData['ID'] = "123"
 
         # send myData (in JSON from) to NETPIE2020 shadow
         client.publish("@shadow/data/update", json.dumps({"data": myData}), 1)
-        time.sleep(5)
+        time.sleep(3)
 
 except KeyboardInterrupt:
     print('Disconnecting successful')
