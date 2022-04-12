@@ -52,9 +52,8 @@ def adc_val(state):
     val = max(adc.read_adc(0),0)
     global max_val 
     max_val = max(val,max_val )
-    if(state):
-        return val
-    return int(val/max_val*100)
+
+    return val if state else int(val/max_val*100)
     
 
 if __name__ == '__main__':
