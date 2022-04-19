@@ -43,6 +43,8 @@ def worksheet_reset(worksheet, row, index=1):
     worksheet.clear()
     worksheet.insert_row(row, index)
 
+def toggle(pin, condition=False):
+    GPIO.output(pin, GPIO.HIGH if condition else GPIO.LOW)
 
 def main():
     main_class = Main()
@@ -60,7 +62,7 @@ class Main:
     GAIN = 1
     PORT = 0
     # led
-    # PIN_O = 3
+    PIN_O = 7
     adc = Adafruit_ADS1x15.ADS1115()
 
     def __init__(self):
@@ -76,7 +78,7 @@ class Main:
         gpio_init()
 
         # using led
-        # outp(self.PIN_O)
+        outp(self.PIN_O)
         # toggle(self.PIN_O, self.status)
 
     def run(self):
@@ -89,7 +91,8 @@ class Main:
             cells = self.worksheet.range('A2:B2')
             cells[0].value = timestamp
             cells[1].value = value
-
+            
+            toggle(self.PIN_O, value>1000)
             try:
                 self.worksheet.update_cells(cells)
                 print(timestamp, value)
