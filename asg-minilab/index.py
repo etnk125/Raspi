@@ -13,6 +13,11 @@ import RPi.GPIO as GPIO
 import Adafruit_ADS1x15
 
 
+from luma.led_matrix.device import max7219
+from luma.core.interface.serial import spi, noop
+from luma.core.virtual import viewport, sevensegment
+
+
 # Initialize Netpie information
 NETPIE_HOST = "broker.netpie.io"
 CLIENT_ID = "9c389ca8-6e95-4063-916d-52f284b5684d"  # YOUR CLIENT ID
@@ -125,6 +130,11 @@ class Main:
         outp(self.PIN_O)
         # toggle(self.PIN_O, self.status)
 
+        # 7seg
+        self.serial = spi(port=0, device=0, gpio=noop())
+        self.device = max7219(self.serial, cascaded=1)
+        self.seg = sevensegment(self.device)
+
     def run(self):
         while True:
             # get timestmap
@@ -140,6 +150,7 @@ class Main:
 
             self.myData['value'] = value
             self.myData['ID'] = "123"
+            self.seg.text = value
             try:
                 self.client.publish("@shadow/data/update",
                                     json.dumps({"data": self.myData}), 1)
