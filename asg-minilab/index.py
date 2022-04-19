@@ -80,13 +80,7 @@ def toggle(pin, condition=False):
 
 
 def main():
-    client = mqtt.Client(protocol=mqtt.MQTTv311,
-                         client_id=CLIENT_ID, clean_session=True)
-    client.username_pw_set(DEVICE_TOKEN)
-    client.on_connect = on_connect
-    client.on_message = on_message
-    client.connect(NETPIE_HOST, 1883)
-    client.loop_start()
+
     main_class = Main()
     main_class.run()
 
@@ -107,7 +101,16 @@ class Main:
     PIN_O = 7
     adc = Adafruit_ADS1x15.ADS1115()
 
+    client = mqtt.Client(protocol=mqtt.MQTTv311,
+                         client_id=CLIENT_ID, clean_session=True)
+
     def __init__(self):
+
+        self.client.username_pw_set(DEVICE_TOKEN)
+        self.client.on_connect = on_connect
+        self.client.on_message = on_message
+        self.client.connect(NETPIE_HOST, 1883)
+        self.client.loop_start()
 
         # connect
         self.worksheet = connect(
@@ -135,7 +138,12 @@ class Main:
             cells[1].value = value
 
             toggle(self.PIN_O, value > 1000)
+
+            self.myData['value'] = value
+            self.myData['ID'] = "123"
             try:
+                self.client.publish("@shadow/data/update",
+                                    json.dumps({"data": self.myData}), 1)
                 self.worksheet.update_cells(cells)
                 print(timestamp, value)
             except Exception as ex:
