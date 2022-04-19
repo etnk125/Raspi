@@ -37,10 +37,10 @@ def on_subscribe(client, userdata, mid, granted_qos):
 
 def on_message(client, userdata, msg):
     load = json.loads(msg.payload)
-    # print(load['data'])
+    print(load['data'])
     if load['data'].get('msg') is not None:
         lcd.lcd_display_string(
-            load['data']['msg']+datetime.now().strftime(" %H:%M:%S"))
+            load['data']['msg']+datetime.now().strftime(" %H:%M:%S"), 1)
 
         # Connecting to NETPIE
 
