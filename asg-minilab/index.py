@@ -152,7 +152,6 @@ class Main:
             self.myData['time'] = timestamp
             self.myData['ID'] = "123"
             self.seg.text = str(value)
-            lcd.lcd_display_string((str(value)), 1)
 
             try:
                 self.client.publish("@shadow/data/update",
