@@ -30,15 +30,14 @@ def on_subscribe(client, userdata, mid, granted_qos):
 
 def on_message(client, userdata, msg):
     load = json.loads(msg.payload)
-    print(load['data'])
-    if load['data'].get('led') is not None:
-        print(load['data']['led'])
-        if load['data']['led'] == "ON":
-            GPIO.output(7, GPIO.HIGH)
-        if load['data']['led'] == "OFF":
-            GPIO.output(7, GPIO.LOW)
+    # print(load['data'])
+    print(load['data']['value'])
+    if load['data'].get('value') > 1000:
+        GPIO.output(7, GPIO.HIGH)
+    else:
+        GPIO.output(7, GPIO.LOW)
 
-            # Connecting to NETPIE
+        # Connecting to NETPIE
 
 
 # gpio init
