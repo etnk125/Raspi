@@ -5,9 +5,40 @@ from datetime import datetime
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 
+import paho.mqtt.client as mqtt  # pip3 install paho-mqtt
+import json
+
 import RPi.GPIO as GPIO
 
 import Adafruit_ADS1x15
+
+
+# Initialize Netpie information
+NETPIE_HOST = "broker.netpie.io"
+CLIENT_ID = "9c389ca8-6e95-4063-916d-52f284b5684d"  # YOUR CLIENT ID
+DEVICE_TOKEN = "tYEw2842zc1iWR6zHHMhcrtpeTYaaCN2"  # YOUR TOKEN
+
+
+def on_connect(client, userdata, flags, rc):
+    print("Result from connect : {}".format(mqtt.connack_string(rc)))
+    client.subscribe("@shadow/data/updated")
+
+
+def on_subscribe(client, userdata, mid, granted_qos):
+    print("Subscribe successful")
+
+
+def on_message(client, userdata, msg):
+    load = json.loads(msg.payload)
+    print(load['data'])
+    if load['data'].get('led') is not None:
+        print(load['data']['led'])
+        if load['data']['led'] == "ON":
+            GPIO.output(7, GPIO.HIGH)
+        if load['data']['led'] == "OFF":
+            GPIO.output(7, GPIO.LOW)
+
+            # Connecting to NETPIE
 
 
 # gpio init
@@ -43,10 +74,19 @@ def worksheet_reset(worksheet, row, index=1):
     worksheet.clear()
     worksheet.insert_row(row, index)
 
+
 def toggle(pin, condition=False):
     GPIO.output(pin, GPIO.HIGH if condition else GPIO.LOW)
 
+
 def main():
+    client = mqtt.Client(protocol=mqtt.MQTTv311,
+                         client_id=CLIENT_ID, clean_session=True)
+    client.username_pw_set(DEVICE_TOKEN)
+    client.on_connect = on_connect
+    client.on_message = on_message
+    client.connect(NETPIE_HOST, 1883)
+    client.loop_start()
     main_class = Main()
     main_class.run()
 
@@ -59,6 +99,8 @@ class Main:
     scope = ["https://spreadsheets.google.com/feeds",
              "https://www.googleapis.com/auth/drive"]
     row = ["Time", "Value"]
+
+    myData = {"ID": 123, "value": 0}
     GAIN = 1
     PORT = 0
     # led
@@ -91,8 +133,8 @@ class Main:
             cells = self.worksheet.range('A2:B2')
             cells[0].value = timestamp
             cells[1].value = value
-            
-            toggle(self.PIN_O, value>1000)
+
+            toggle(self.PIN_O, value > 1000)
             try:
                 self.worksheet.update_cells(cells)
                 print(timestamp, value)
