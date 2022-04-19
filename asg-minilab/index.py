@@ -39,10 +39,8 @@ def on_message(client, userdata, msg):
     load = json.loads(msg.payload)
     # print(load['data'])
     print(load['data']['value'])
-    if load['data'].get('value') > 1000:
-        GPIO.output(7, GPIO.HIGH)
-    else:
-        GPIO.output(7, GPIO.LOW)
+    if load['data'].get('msg') is not None:
+        lcd.lcd_display_string(load['data']['msg']+load['data']['time'])
 
         # Connecting to NETPIE
 
