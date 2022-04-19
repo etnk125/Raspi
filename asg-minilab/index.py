@@ -57,7 +57,8 @@ class Main:
     scope = ["https://spreadsheets.google.com/feeds",
              "https://www.googleapis.com/auth/drive"]
     row = ["Time", "Value"]
-
+    GAIN = 1
+    PORT = 0
     # led
     # PIN_O = 3
     adc = Adafruit_ADS1x15.ADS1115()
