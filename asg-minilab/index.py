@@ -150,7 +150,7 @@ class Main:
 
             self.myData['value'] = value
             self.myData['ID'] = "123"
-            self.seg.text = value
+            self.seg.text = str(value)
             try:
                 self.client.publish("@shadow/data/update",
                                     json.dumps({"data": self.myData}), 1)
