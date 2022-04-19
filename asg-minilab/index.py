@@ -18,6 +18,7 @@ from luma.core.interface.serial import spi, noop
 from luma.core.virtual import viewport, sevensegment
 
 import lcddriver
+lcd = lcddriver.lcd()
 
 # Initialize Netpie information
 NETPIE_HOST = "broker.netpie.io"
@@ -109,8 +110,6 @@ class Main:
     client = mqtt.Client(protocol=mqtt.MQTTv311,
                          client_id=CLIENT_ID, clean_session=True)
 
-    lcd = lcddriver.lcd()
-
     def __init__(self):
 
         self.client.username_pw_set(DEVICE_TOKEN)
@@ -152,9 +151,10 @@ class Main:
             toggle(self.PIN_O, value > 1000)
 
             self.myData['value'] = value
+            self.myData['time'] = timestamp
             self.myData['ID'] = "123"
             self.seg.text = str(value)
-            self.lcd.lcd_display_string((str(value)), 1)
+            lcd.lcd_display_string((str(value)), 1)
 
             try:
                 self.client.publish("@shadow/data/update",
