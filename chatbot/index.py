@@ -1,5 +1,6 @@
 # import
 from flask import Flask, request, make_response, jsonify
+import RPi.GPIO as GPIO
 import os
 import json
 ##
@@ -9,6 +10,13 @@ app = Flask(__name__)
 log = app.logger
 
 # recieve request from webhook
+
+def gpio_init():
+    GPIO.setmode(GPIO.BOARD)
+    GPIO.setwarnings(False)
+    GPIO.setup(7, GPIO.OUT)
+
+
 
 
 @app.route("/", methods=['POST'])
@@ -21,13 +29,14 @@ def webhook():
     except AttributeError:
         return 'json error'
     # action switcher
-
-    if action == 'TurnONLED':
+    res=""
+    if action == 'TurnOnLED':
         res = turn_on(req)
-    elif action == 'Turn off':
-        res = turn_off(req)
+    elif action == 'TurnOffLED':
+         res = turn_off(req)
     else:
-        log.error('Unexpected action.')
+         log.error('Unexpected action.')
+   
 
     print('Action: ' + str(action))
     print('Response: ' + res)
@@ -37,14 +46,17 @@ def webhook():
 
 
 def turn_off(req):
+    GPIO.output(7, GPIO.LOW)
     return 'Finish off'
 
 
 def turn_on(req):
+    GPIO.output(7, GPIO.HIGH)
     return 'Finish on'
 
 
 # run flask app
 if __name__ == '__main__':
+    gpio_init()
     app.run(host='0.0.0.0', debug=True, port=int(
         os.environ.get('PORT', '5000')))
