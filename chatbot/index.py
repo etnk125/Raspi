@@ -40,12 +40,13 @@ def webhook():
 
     print('Action: ' + str(action))
     print('Response: ' + res)
-
+    # print(json.dumps(req, indent=2, sort_keys=True))
     # return response
     return make_response(jsonify({'fulfillmentText': res}))
 
 
 def turn_off(req):
+    
     GPIO.output(7, GPIO.LOW)
     return 'Finish off'
 
