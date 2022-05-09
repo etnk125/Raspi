@@ -105,7 +105,7 @@ class Main:
              "https://www.googleapis.com/auth/drive"]
     row = ["Time", "Value"]
 
-    myData = {"ID": 123, "temp": 0, "aqi": 0}
+    myData = {"ID": 123, "value": 0, "msg": "","time":""}
     GAIN = 1
     PORT = 0
     # led
@@ -163,18 +163,19 @@ class Main:
 
             toggle(self.PIN_O, AQI > 100)
 
-            self.myData['AQI'] = AQI
+            self.myData['value'] = AQI
 
-            self.myData['TEMP'] = self.get_temp(TEMP)
+            self.myData['msg'] = self.get_temp(TEMP)
             self.myData['time'] = timestamp
+
             self.myData['ID'] = "123"
             # self.seg.text = str(value)
 
             try:
                 self.client.publish("@shadow/data/update",
                                     json.dumps({"data": self.myData}), 1)
-                self.worksheet[0].append_cell([timestamp, AQI])
-                self.worksheet[1].append_cell([timestamp, TEMP])
+                self.worksheet[0].append_row([timestamp,AQI])
+                self.worksheet[1].append_row([timestamp,TEMP])
                 print(self.myData)
             except Exception as ex:
                 print("Google sheet login failed with error:", ex)
@@ -184,7 +185,7 @@ class Main:
         self.fahrenheit = not self.fahrenheit
 
     def get_temp(self, TEMP=0):
-        return TEMP + "Celsius" if self.fahrenheit else (TEMP * 9 / 5 + 32) + "Fahrenheit"
+        return TEMP + " Celsius" if self.fahrenheit else str(TEMP * 9 / 5 + 32) + " Fahrenheit"
 
 
 if __name__ == "__main__":
