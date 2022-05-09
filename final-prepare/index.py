@@ -133,7 +133,7 @@ class Main:
             self.SheetName, self.GSheet_OAUTH_JSON, self.worksheet_name[1], self.scope)
 
         # config worksheet
-        for ws in self.worksheet:
+        for ws in self.worksheet.values():
             worksheet_reset(ws, self.row)
 
         # using gpio
