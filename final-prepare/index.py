@@ -201,9 +201,6 @@ class Main:
         return TEMP + " Celsius" if not self.fahrenheit else str(TEMP * 1.8 + 32) + " Fahrenheit"
 
 
-# import
-
-
 # create flask app
 app = Flask(__name__)
 log = app.logger
