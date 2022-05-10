@@ -72,6 +72,12 @@ def outp(pin: int):
     GPIO.setup(pin, GPIO.OUT)
 
 
+# use switch
+def use_switch(pin, handle=None):
+    GPIO.setup(pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.add_event_detect(pin, GPIO.FALLING, callback=handle, bouncetime=100)
+
+
 # connect ggs
 def connect(SheetName, GSheet_OAUTH_JSON, worksheet_name, scope):
     credentials = ServiceAccountCredentials.from_json_keyfile_name(
@@ -112,6 +118,8 @@ class Main:
     PORT = 0
     # led
     PIN_O = 7
+    # using switch
+    PIN_SW = 9
     # using fsr
     # adc = Adafruit_ADS1x15.ADS1115()
 
@@ -143,6 +151,9 @@ class Main:
 
         # using led
         outp(self.PIN_O)
+        # using switch
+        inp(self.PIN_SW)
+        use_switch(self.PIN_SW, self.toggle_fahrenheit)
         # toggle(self.PIN_O, self.status)
 
         # 7seg
