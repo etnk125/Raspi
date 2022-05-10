@@ -19,9 +19,9 @@ def webhook():
     # action switcher
     res = ""
     if action == 'AQI':
-        res = "AQI"
+        res = "AQI intend foom pi"
     elif action == 'TEMP':
-        res = "TEMP"
+        res = "TEMP intend fomm pi"
     else:
         log.error('Unexpected action.')
 

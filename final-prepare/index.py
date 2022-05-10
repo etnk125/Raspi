@@ -117,14 +117,14 @@ class Main:
     # led
     PIN_O = 7
     # using switch
-    PIN_SW = 9
+    PIN_SW = 8
     # using fsr
     # adc = Adafruit_ADS1x15.ADS1115()
 
     # netpie client
     client = mqtt.Client(protocol=mqtt.MQTTv311,
                          client_id=CLIENT_ID, clean_session=True)
-
+    fahrenheit = False
     def __init__(self):
         # connect to netpie
         self.client.username_pw_set(DEVICE_TOKEN)
@@ -150,7 +150,7 @@ class Main:
         # using led
         outp(self.PIN_O)
         # using switch
-        inp(self.PIN_SW)
+        # inp(self.PIN_SW)
         use_switch(self.PIN_SW, self.toggle_fahrenheit)
         # toggle(self.PIN_O, self.status)
 
@@ -187,16 +187,17 @@ class Main:
                                     json.dumps({"data": self.myData}), 1)
                 self.worksheet[0].append_row([timestamp, AQI])
                 self.worksheet[1].append_row([timestamp, TEMP])
-                print(self.myData)
+                # print(self.myData)
             except Exception as ex:
                 print("Google sheet login failed with error:", ex)
             time.sleep(5)
 
-    def toggle_fahrenheit(self):
+    def toggle_fahrenheit(self,e):
+        print("toggle")
         self.fahrenheit = not self.fahrenheit
 
     def get_temp(self, TEMP=0):
-        return TEMP + " Celsius" if not self.fahrenheit else str(TEMP * 1.8 + 32) + " Fahrenheit"
+        return str(TEMP) + " Celsius" if not self.fahrenheit else str(TEMP * 1.8 + 32) + " Fahrenheit"
 
 
 
