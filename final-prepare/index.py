@@ -70,12 +70,6 @@ def outp(pin: int):
     GPIO.setup(pin, GPIO.OUT)
 
 
-# use switch
-def use_switch(pin, handle=None):
-    GPIO.setup(pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-    GPIO.add_event_detect(pin, GPIO.FALLING, callback=handle, bouncetime=100)
-
-
 # connect ggs
 def connect(SheetName, GSheet_OAUTH_JSON, worksheet_name, scope):
     credentials = ServiceAccountCredentials.from_json_keyfile_name(
@@ -105,7 +99,7 @@ class Main:
     # config data
     SheetName = "data logger online"
     GSheet_OAUTH_JSON = "key.json"
-    worksheet_name = ['AQI', 'TEMP']
+    worksheet_name = "final"
 
     scope = ["https://spreadsheets.google.com/feeds",
              "https://www.googleapis.com/auth/drive"]
@@ -114,10 +108,6 @@ class Main:
     myData = {"ID": 123, "value": 0, "msg": "", "time": ""}
     GAIN = 1
     PORT = 0
-    # led
-    PIN_O = 7
-    # using switch
-    PIN_SW = 8
     # using fsr
     # adc = Adafruit_ADS1x15.ADS1115()
 
@@ -125,6 +115,7 @@ class Main:
     client = mqtt.Client(protocol=mqtt.MQTTv311,
                          client_id=CLIENT_ID, clean_session=True)
     fahrenheit = False
+
     def __init__(self):
         # connect to netpie
         self.client.username_pw_set(DEVICE_TOKEN)
@@ -134,33 +125,14 @@ class Main:
         self.client.loop_start()
 
         # connect worksheet
-        self.worksheet = {}
-        self.worksheet[0] = connect(
-            self.SheetName, self.GSheet_OAUTH_JSON, self.worksheet_name[0], self.scope)
-        self.worksheet[1] = connect(
-            self.SheetName, self.GSheet_OAUTH_JSON, self.worksheet_name[1], self.scope)
+        self.worksheet = connect(
+            self.SheetName, self.GSheet_OAUTH_JSON, self.worksheet_name, self.scope)
 
         # config worksheet
-        for ws in self.worksheet.values():
-            worksheet_reset(ws, self.row)
+        worksheet_reset(self.worksheet, self.row)
 
         # using gpio
         gpio_init()
-
-        # using led
-        outp(self.PIN_O)
-        # using switch
-        # inp(self.PIN_SW)
-        use_switch(self.PIN_SW, self.toggle_fahrenheit)
-        # toggle(self.PIN_O, self.status)
-
-        # 7seg
-        # self.serial = spi(port=0, device=0, gpio=noop())
-        # self.device = max7219(self.serial, cascaded=1)
-        # self.seg = sevensegment(self.device)
-
-        # using fahrenheit or celsius
-        self.fahrenheit = False
 
     def run(self):
         while True:
@@ -169,14 +141,15 @@ class Main:
             timestamp = now.strftime("%H:%M:%S")
             # value = max(self.adc.read_adc(self.PORT, self.GAIN), 0)
 
-            AQI = random.randint(0, 200)
-            TEMP = random.randint(0, 45)
+            AQI = random.randint(0, 100)
+            PM = random.randint(0, 250)
 
-            toggle(self.PIN_O, AQI > 100)
+            if AQI > 50 or PM > 50:
+                print('send line notify')
 
             self.myData['value'] = AQI
 
-            self.myData['msg'] = self.get_temp(TEMP)
+            self.myData['msg'] = PM
             self.myData['time'] = timestamp
 
             self.myData['ID'] = "123"
@@ -185,21 +158,11 @@ class Main:
             try:
                 self.client.publish("@shadow/data/update",
                                     json.dumps({"data": self.myData}), 1)
-                self.worksheet[0].append_row([timestamp, AQI])
-                self.worksheet[1].append_row([timestamp, TEMP])
+                self.worksheet.append_row([timestamp, AQI, PM])
                 # print(self.myData)
             except Exception as ex:
                 print("Google sheet login failed with error:", ex)
-            time.sleep(5)
-
-    def toggle_fahrenheit(self,e):
-        print("toggle")
-        self.fahrenheit = not self.fahrenheit
-
-    def get_temp(self, TEMP=0):
-        return str(TEMP) + " Celsius" if not self.fahrenheit else str(TEMP * 1.8 + 32) + " Fahrenheit"
-
-
+            time.sleep(3)
 
 
 if __name__ == "__main__":

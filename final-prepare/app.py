@@ -1,10 +1,35 @@
 
 import os
 from flask import Flask, request, make_response, jsonify
-
+# using gg sheet
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
 # create flask app
 app = Flask(__name__)
 log = app.logger
+
+
+def connect(SheetName, GSheet_OAUTH_JSON, worksheet_name, scope):
+    credentials = ServiceAccountCredentials.from_json_keyfile_name(
+        GSheet_OAUTH_JSON, scope)
+    client = gspread.authorize(credentials)
+    worksheet = client.open(SheetName).worksheet(worksheet_name)
+    return worksheet
+
+
+SheetName = "data logger online"
+GSheet_OAUTH_JSON = "key.json"
+worksheet_name = ['AQI', 'TEMP']
+scope = ["https://spreadsheets.google.com/feeds",
+         "https://www.googleapis.com/auth/drive"]
+# connect worksheet
+worksheet = {}
+worksheet[0] = connect(
+    SheetName, GSheet_OAUTH_JSON, worksheet_name[0], scope)
+worksheet[1] = connect(
+    SheetName, GSheet_OAUTH_JSON, worksheet_name[1], scope)
+
+# connect ggs
 
 
 @app.route("/", methods=['POST'])
@@ -20,8 +45,8 @@ def webhook():
     res = ""
     if action == 'AQI':
         res = "AQI intend foom pi"
-    elif action == 'TEMP':
-        res = "TEMP intend fomm pi"
+    elif action == 'PM':
+        res = "PM2.5 intend fomm pi"
     else:
         log.error('Unexpected action.')
 
