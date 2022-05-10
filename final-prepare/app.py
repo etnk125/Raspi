@@ -19,37 +19,44 @@ def connect(SheetName, GSheet_OAUTH_JSON, worksheet_name, scope):
 
 SheetName = "data logger online"
 GSheet_OAUTH_JSON = "key.json"
-worksheet_name = ['AQI', 'TEMP']
+worksheet_name = "final"
 scope = ["https://spreadsheets.google.com/feeds",
          "https://www.googleapis.com/auth/drive"]
 # connect worksheet
-worksheet = {}
-worksheet[0] = connect(
-    SheetName, GSheet_OAUTH_JSON, worksheet_name[0], scope)
-worksheet[1] = connect(
-    SheetName, GSheet_OAUTH_JSON, worksheet_name[1], scope)
-
+worksheet = connect(
+    SheetName, GSheet_OAUTH_JSON, worksheet_name, scope)
 # connect ggs
 
 
 @app.route("/", methods=['POST'])
 def webhook():
     req = request.get_json(silent=True, force=True)
-#    print(req.get('queryResult').get('parameters').get('place'))
+    # print(req.get('queryResult').get('parameters').get('time'))
 
     try:
         action = req.get('queryResult').get('intent').get('displayName')
     except AttributeError:
         return 'json error'
     # action switcher
+    
+    datas= worksheet.get_all_records()
+    time_param = req.get('queryResult').get('parameters').get('time')
+    data = datas[-1]
+    if time_param is not None:
+        for i in datas:
+            if i['Time'] == time_param:
+                data=i
+                break
     res = ""
     if action == 'AQI':
-        res = "AQI intend foom pi"
+        res = "AQI : "+ str(data[action])
     elif action == 'PM':
-        res = "PM2.5 intend fomm pi"
+        res = "PM2.5 : "+ str(data[action])
     else:
         log.error('Unexpected action.')
+   
 
+    print(data)
     print('Action: ' + str(action))
     print('Response: ' + res)
     # print(json.dumps(req, indent=2, sort_keys=True))

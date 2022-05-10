@@ -46,11 +46,6 @@ def on_subscribe(client, userdata, mid, granted_qos):
 def on_message(client, userdata, msg):
     load = json.loads(msg.payload)
     print(load['data'])
-    if load['data'].get('msg') is not None:
-        print(
-            load['data']['msg']+datetime.now().strftime(" %H:%M:%S"), 1)
-
-        # Connecting to NETPIE
 
 
 # gpio init
@@ -103,7 +98,7 @@ class Main:
 
     scope = ["https://spreadsheets.google.com/feeds",
              "https://www.googleapis.com/auth/drive"]
-    row = ["Time", "Value"]
+    row = ["Time", "AQI","PM"]
 
     myData = {"ID": 123, "value": 0, "msg": "", "time": ""}
     GAIN = 1
@@ -144,8 +139,8 @@ class Main:
             AQI = random.randint(0, 100)
             PM = random.randint(0, 250)
 
-            if AQI > 50 or PM > 50:
-                print('send line notify')
+            # if AQI > 50 or PM > 150:
+            #     print('send line notify')
 
             self.myData['value'] = AQI
 
